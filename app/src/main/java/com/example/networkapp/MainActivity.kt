@@ -14,6 +14,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import java.io.BufferedReader
 import java.io.FileOutputStream
 
 // TODO (1: Fix any bugs)
@@ -45,6 +46,33 @@ class MainActivity : AppCompatActivity() {
             downloadComic(numberEditText.text.toString())
         }
 
+        /*if (file.exists()) {
+            try {
+                val br = BufferedReader(FileReader(file))
+                val text = StringBuilder()
+                var line: String?
+                while (br.readLine().also { line = it } != null) {
+                    text.append(line)
+                    text.append('\n')
+                }
+                br.close()
+                textBox.setText(text.toString())
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }*/
+
+
+        val prefs = getSharedPreferences("comic_prefs", MODE_PRIVATE)
+        val savedTitle = prefs.getString("title", null)
+
+        if (savedTitle != null) {
+            titleTextView.text = savedTitle
+            descriptionTextView.text = prefs.getString("alt", "")
+            Picasso.get().load(prefs.getString("img", "")).into(comicImageView)
+            numberEditText.setText(prefs.getString("num", ""))
+        }
+
     }
 
     // Fetches comic from web as JSONObject
@@ -53,8 +81,8 @@ class MainActivity : AppCompatActivity() {
         requestQueue.add (
             JsonObjectRequest(url
                 , {
-                    showComic(it)
                     saveComic(it)
+                    showComic(it)
                   }
                 , {}
             )
@@ -71,12 +99,21 @@ class MainActivity : AppCompatActivity() {
     // Implement this function
     private fun saveComic(comicObject: JSONObject) {
 
+        /*try {
+            val outputStream = FileOutputStream(file)
+            outputStream.write(textBox.text.toString().toByteArray())
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }*/
+
         val prefs = getSharedPreferences("comic prefs", MODE_PRIVATE)
         prefs.edit()
             .putString("title", comicObject.getString("title"))
             .putString("alt", comicObject.getString("alt"))
             .putString("img", comicObject.getString("img"))
             .putString("num", comicObject.getString("num"))
+            .apply()
 
     }
 
