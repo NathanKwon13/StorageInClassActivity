@@ -14,6 +14,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import java.io.FileOutputStream
 
 // TODO (1: Fix any bugs)
 // TODO (2: Add function saveComic(...) to save comic info when downloaded
@@ -51,7 +52,10 @@ class MainActivity : AppCompatActivity() {
         val url = "https://xkcd.com/$comicId/info.0.json"
         requestQueue.add (
             JsonObjectRequest(url
-                , {showComic(it)}
+                , {
+                    showComic(it)
+                    saveComic(it)
+                  }
                 , {}
             )
         )
@@ -66,6 +70,13 @@ class MainActivity : AppCompatActivity() {
 
     // Implement this function
     private fun saveComic(comicObject: JSONObject) {
+
+        val prefs = getSharedPreferences("comic prefs", MODE_PRIVATE)
+        prefs.edit()
+            .putString("title", comicObject.getString("title"))
+            .putString("alt", comicObject.getString("alt"))
+            .putString("img", comicObject.getString("img"))
+            .putString("num", comicObject.getString("num"))
 
     }
 
